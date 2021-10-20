@@ -1,0 +1,31 @@
+{
+    "dev": {
+      "username": "app",
+      "password": "QAZWSX123456@",
+      "database": "university_app_dev_db",
+      "host": "127.0.0.1",
+      "dialect": "mariadb",
+      "AUTH_KEY": "fgeiyfb",
+      "PORT": 3001
+    },
+    "test": {
+      "username": "app",
+      "password": "QAZWSX123456@",
+      "database": "university_app_test_db",
+      "host": "127.0.0.1",
+      "dialect": "mariadb",
+      "AUTH_KEY": "sifogfg",
+      "PORT": 3002,
+      "logging": false
+    },
+    "prod": {
+      "username": "app",
+      "password": "QAZWSX123456@",
+      "database": "university_app_prod_db",
+      "host": "127.0.0.1",
+      "dialect": "mariadb",
+      "AUTH_KEY": "sifogdiugP",
+      "PORT": 3000,
+      "logging": false
+    }
+}
