@@ -1,7 +1,8 @@
 const bcrypt = require('bcrypt')
 const jwt = require ('jsonwebtoken')
 const env = process.env.NODE_ENV || 'development';
-const config = require('../../config/config.json')[env];
+const config = require('../../../config/config.json')[env];
+const userController = require('../../../controllers/user.controller')
 
 module.exports = {
     hashCredentials: async function(pwd) {
@@ -13,18 +14,14 @@ module.exports = {
             if(data.userBlocked) {
                 reject("User is blocked!")
             } else {
-                if(await bcrypt.compare(req,data.password) && data.loginRetry < 3) {
-                    data.loginRetry = 0
-                    await data.save()
-                    resolve('OK')
+                if(await bcrypt.compare(req, data.password) && data.loginRetry < 3) {
+                    resolve(true)
                 } else {
-                    data.loginRetry = data.loginRetry + 1
-                    await data.save()
                     if(data.loginRetry < 3) {
+                        await userController.increaseLoginRetry(data.email)
                         reject("Invalid password!")
                     } else {
-                        data.userBlocked = true
-                        await data.save()
+                        await userController.setBlockUser(data.email)
                         reject("Invalid password! User has been blocked!")
                     }
                 }
@@ -32,16 +29,15 @@ module.exports = {
         })
     },
 
-    checkOAuthToken: async function(req, res, next) {
+    checkOAuthToken: async function(req) {
         return new Promise((resolve, reject) => {
             const token = req.headers.authorization.split(" ")[1]
             jwt.verify(token, config.AUTH_KEY, function(err, decoded){
                 if(err){
-                    reject("You cannot do any actions. The reason is: AUTH FAILED!")
+                    reject(`You cannot do any actions. The reason is: AUTH FAILED!`)
                 }
                 req.userData = decoded
                 resolve(req.userData)
-                next()
             })
         })/*
         try {
@@ -62,7 +58,7 @@ module.exports = {
         return re.test(String(email).toLowerCase());
     },
 
-    validateRegisterUser: function(req, res) {
+    validateRegisterUser: function(req, isLogin) {
         return new Promise((resolve, reject) => {
             if(Object.keys(req.body).length === 0) {
                 reject("There is no information to create a new user")
@@ -70,6 +66,16 @@ module.exports = {
             if(!this.validateEmail(req.body.email)) {
                 reject("Email address is invalid")
             }
+            if(!isLogin) {
+                if(req.body["roleName"] === undefined) {
+                    reject('User role is not defined')
+                } else {
+                    if(!(req.body["roleName"] === 'ADMIN') && !(req.body["roleName"] === "SECRETARY") && !(req.body["roleName"] === "STUDENT") && !(req.body["roleName"] === "TEACHER")) {
+                        reject('User role is not set correctly. User role can be "ADMIN" or "SECRETARY"')
+                    }
+                }
+            }
+
             resolve("Data are passed!")
         })
     }

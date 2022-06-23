@@ -27,10 +27,6 @@ module.exports = (sequelize) => {
             type: DataTypes.STRING,
             allowNull: false
         },
-        userRole: {
-            type: DataTypes.ENUM('ADMIN', 'STUDENT', 'TEACHER', 'SECRETARY'),
-            allowNull: false
-        },
         userBlocked: {
             type: DataTypes.BOOLEAN,
             allowNull: false
@@ -38,17 +34,22 @@ module.exports = (sequelize) => {
         loginRetry: {
             type: DataTypes.INTEGER,
             allowNull: false
+        },
+        connected: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            allowNull: false
+        },
+        firstLogin: {
+            type: DataTypes.BOOLEAN,
+            defaultValue:true,
+            allowNull: false
         }
     })
 
     User.associate = (models) => {
-        User.hasOne(models.AppSettings, {as: 'appsettings', foreignKey: 'userId'})
-/*        User.hasOne(models.Rights, {as: 'rights', foreignKey:'userId'})
-        User.hasOne(models.Students, {as: 'student', foreignKey:'userId'})
-        User.hasOne(models.Teachers, {as: 'teacher', foreignKey:'userId'})
-        User.hasOne(models.Secretaries, {as: 'secretary', foreignKey:'userId'})
-        User.belongsTo(models.Universities, {foreignKey: 'universityId', as: 'user'})
-        */
+        User.hasOne(models.Profiles)
+        User.hasOne(models.UserRoles)
     }
     return User
 }
