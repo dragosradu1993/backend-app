@@ -14,7 +14,8 @@ const {
     unblockUser,
     passwordReset,
     editProfile,
-    getUsersByRole
+    getUsersByRole,
+    selfResetPassword
 } = require('../services/user/user.service')
 
 const secretariesService = require('../services/app/secretary.service')
@@ -33,6 +34,7 @@ router.route('/post/pwd-reset').post(passwordReset)
 
 //profile
 router.route('/edit/edit-profile').post(editProfile)
+router.route('/post/reset-password').post(selfResetPassword)
 
 //Secretaries
 router.route('/secretaries/add').post(secretariesService.secretariesCRUD.add)

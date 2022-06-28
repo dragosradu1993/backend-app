@@ -29,6 +29,17 @@ module.exports = {
         })
     },
 
+    generateRandomPassword: function(length) {
+        let result = ''
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@!_'
+        const charsLength = chars.length
+        for(let i = 0; i<length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * charsLength))
+        }
+
+        return result
+    },
+
     checkOAuthToken: async function(req) {
         return new Promise((resolve, reject) => {
             const token = req.headers.authorization.split(" ")[1]

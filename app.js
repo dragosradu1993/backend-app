@@ -1,13 +1,12 @@
 const express = require('express')
 const app = express()
 const cors = require('cors')
-const formidableMiddleware = require('express-formidable');
 const multer = require('multer')
 const upload = multer()
 const bodyParser = require('body-parser');
 
 var allowedOrigins = ['http://localhost:3002',
-                      'http://192.168.68.56:3002'];
+                      'http://192.168.68.56:3002', 'http://localhost:3000'];
 app.use(cors({
   origin: function(origin, callback){
     // allow requests with no origin 
@@ -21,14 +20,13 @@ app.use(cors({
     return callback(null, true);
   }
 }));
-//app.use(express.urlencoded({ extended: true}));
-//app.use(express.json())
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({ extended: true }))
-//app.use(formidableMiddleware())
 
 app.use('/static', express.static('resources'))
+
+app.disable('x-powered-by')
 
 const userRoutes = require('./routes/user.routes')
 app.use(`/api-${process.env.NODE_ENV}/users`, userRoutes)

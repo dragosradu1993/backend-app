@@ -92,6 +92,31 @@ module.exports = {
         })
     },
 
+    getUsersLastXDays: async function(numberOfDays) {
+        return new Promise(async (resolve, reject) => {
+            if(numberOfDays === undefined) {
+                reject('You have to set the number of days')
+            } else {
+                const users = await db.Users.findAll({
+                    where: {
+                        createdAt: {
+                            [Op.gte]: new Date(new Date() - numberOfDays * (24 * 60 * 60 * 1000))
+                        }
+                    },
+                    attributes: {
+                        exclude: ['password']
+                    }
+                })
+                
+                if(users) {
+                    resolve(users)
+                } else {
+                    reject([])
+                }
+            }
+        })
+    },
+
     getByRole: async function(userRole) {
         return new Promise(async (resolve, reject) => {
             const users = await db.UserRoles.findAll({
@@ -268,6 +293,8 @@ module.exports = {
             user.password = req.body.password
             if(fl === 'true')
                 user.firstLogin = false
+            else 
+                user.firstLogin = true
             user.save()
             .then(() => {
                 resolve(user)

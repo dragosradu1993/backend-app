@@ -11,7 +11,8 @@ const {
     getAppMenu,
     getAppDashboard,
     getAllUsersData,
-    getBlockedUsers
+    getBlockedUsers,
+    getUsersLastXDays
 } = require('../services/app/app.service')
 
 const student = require('../services/app/student.service')
@@ -28,6 +29,7 @@ router.route('/app-info/get/main-menu').get(getAppMenu)
 router.route('/app-info/get/dashboard').get(getAppDashboard)
 router.route('/app-info/get/all-user-data').get(getAllUsersData)
 router.route('/app-info/get/get-blocked-users').get(getBlockedUsers)
+router.route('/app-info/get/users-last-days').get(getUsersLastXDays)
 
 
 //Students

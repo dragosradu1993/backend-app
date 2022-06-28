@@ -56,6 +56,37 @@ module.exports = {
         })
     },
 
+    getUsersLastXDays: async function(req,res) {
+        await userUtils.checkOAuthToken(req)
+        .then(async (request) => {
+            try {
+                const user = await userController.getUserFullData(request.user.email, false)
+                if(user.UserRole.roleName === 'ADMIN') {
+                    const usersLastXDays = await userController.getUsersLastXDays(req.query.days)
+                    res.status(200).json(usersLastXDays)
+                } else {
+                    res.status(403)
+                    .json({
+                        title: "App Info Error",
+                        success: false,
+                        message: "You don't have permissions to perform this operation. Please check with the Administrator!"
+                    })
+                }
+            } catch(error) {
+                res.status(400).json({message: error})
+            }
+        })
+        .catch((error) => {
+            res.status(401).json({
+                title: "Error",
+                details: {
+                    success: false,
+                    message: error
+                }
+            })
+        })
+    },
+
     //Only admin can edit the app Info
     edit: async function(req, res) {
         await userUtils.checkOAuthToken(req)
@@ -111,6 +142,7 @@ module.exports = {
             })
         })
     },
+    
 
     //Only admin can delete the app Info
     deleteInfo: async function(req) {

@@ -59,7 +59,7 @@ module.exports = {
         })
     },
 
-    add: async function(student) {
+    add: async function(student, profileId) {
         return new Promise(async (resolve, reject) => {
             const newStudent = new db.Students(student)
             await newStudent.save()

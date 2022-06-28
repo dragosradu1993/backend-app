@@ -65,19 +65,21 @@ module.exports = {
         dashboard.content.push({
             'title': 'Utilizatori blocati',
             'titleVariant': 'h5',
-            'titleColor': 'white',
+            'titleColor': '#1a1a1a',
             'value': data.length,
             'valueVariant': 'h2',
-            'valueColor': 'white',
-            'valueWidth': '100'
+            'valueColor': '#1a1a1a',
+            'valueWidth': '100',
+            'cardColor': data.length ? '#ff5c33' : '#99CAF9'
         }, {
             'title': 'Alt tile',
             'titleVariant': 'h5',
-            'titleColor': 'white',
+            'titleColor': '#1a1a1a',
             'value': data.length,
             'valueVariant': 'h2',
-            'valueColor': 'white',
-            'valueWidth': '100' 
+            'valueColor': '#1a1a1a',
+            'valueWidth': '100',
+            'cardColor': data.length ? '#ff5c33' : '#99CAF9'
         })
 
         return dashboard

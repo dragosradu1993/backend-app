@@ -5,6 +5,7 @@ const db = require('../../models')
 const userUtils = require('./utils/userUtils')
 const userController = require('../../controllers/user.controller')
 const profileController = require('../../controllers/profiles/profile.controller')
+const send = require('../mail/sender')
 
 const env = process.env.NODE_ENV
 const config = require("../../config/config.json")[env]
@@ -206,6 +207,43 @@ module.exports = {
                     success: false,
                     message: error
                 }) 
+            }
+        })
+        .catch((error) => {
+            res.status(401).json({
+                title: "Error",
+                details: {
+                    success: false,
+                    message: error
+                }
+            })
+        })
+    },
+
+    selfResetPassword: async function(req,res) {
+        await userUtils.checkOAuthToken(req)
+        .then(async (request) => {
+            try {
+                const user = await userController.getUser(request.user.email)
+                if(user) {
+                    const newPwd = userUtils.generateRandomPassword(8)
+                    req.body.password = newPwd
+                    await userController.changePassword(req, user, false)
+                    .then(async() => {
+                        await send(`<p>Parola ta tocmai a fost resetata</p><br/><p>Parola temporara este <b>${newPwd}</b></p>`, request.user.email, 'Parola ta a fost resetata')
+                        .then((results) =>{
+                            res.status(200).json({message: `Password has been reset! We sent an email with a temporary password at ${request.user.email}`})
+                        })
+                        .catch((message) => {
+                            res.status(400).json({message:message})
+                        })
+                    })
+                    .catch((message) => {
+                        res.status(400).json({message: message})
+                    })
+                }
+            } catch (error) {
+                res.status(400).json({message: error})
             }
         })
         .catch((error) => {
