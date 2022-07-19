@@ -28,9 +28,27 @@ module.exports = {
         })
     },
 
+    getAllByFacultyId: async function(facultyId) {
+        return new Promise(async (resolve, reject) => {
+            const promotions = await db.Promotions.findAll({
+                where: {
+                    facultyId: facultyId
+                },
+                order: [
+                    ['year', 'DESC'],
+                ]
+            })
+            if(promotions) {
+                resolve(promotions)
+            } else {
+                reject([])
+            }
+        })
+    },
+
     add: async function(promotion) {
         return new Promise(async (resolve, reject) => {
-            await this.setAllNotCurrent()
+            await this.setAllNotCurrent(promotion.FacultyId)
             .then(async () => {
                 const newPromotion = new db.Promotions(promotion)
                 newPromotion.isCurrent = true
@@ -48,17 +66,21 @@ module.exports = {
         })
     },
 
-    setAllNotCurrent: async function() {
+    setAllNotCurrent: async function(facultyId) {
         return new Promise(async (resolve, reject) => {
-            const promotions = await db.Promotions.findAll({})
+            const promotions = await db.Promotions.findAll({
+                where: {
+                    FacultyId: facultyId
+                }
+            })
             if(promotions) {
                 let count = 0
-                promotions.map(async (item, index) => {
-                    await edit(item.id, {isCurrent: false})
-                    .then(() => {
+                for(let i=0; i<promotions.length;i++) {
+                    const edited = await this.edit(promotions[i].id, {isCurrent: false})
+                    if(edited) {
                         count++
-                    })
-                })
+                    }
+                }
                 if (count === promotions.length) {
                     resolve('Current Promotion: All promotions are set to false')
                 } else {
@@ -77,10 +99,10 @@ module.exports = {
                     id: id
                 }
             })
-            if(newPromotion.has('year')) {
+            if(newPromotion.hasOwnProperty('year')) {
                 promotion.year = newPromotion.year
             }
-            if(newPromotion.has('isCurrent')) {
+            if(newPromotion.hasOwnProperty('isCurrent')) {
                 promotion.isCurrent = newPromotion.isCurrent
             }
             await promotion.save()

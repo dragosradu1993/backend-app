@@ -59,15 +59,97 @@ module.exports = {
         })
     },
 
-    add: async function(teacher) {
+    getTeacherWithProfileAndUser: async function(teacherId) {
         return new Promise(async (resolve, reject) => {
-            const newTeacher = new db.Teachers(student)
+            const teacher = await db.Teachers.findOne({
+                where: {
+                    id: teacherId
+                },
+                include: [
+                    {
+                        model: db.Profiles,
+                        include: [
+                            {
+                                model: db.Users
+                            }
+                        ]
+                    }
+                ]
+            })
+
+            if(teacher) {
+                resolve(teacher)
+            } else {
+                reject({})
+            }
+        })
+    },
+
+    add: async function(teacher, profileId) {
+        return new Promise(async (resolve, reject) => {
+            let tempTeacher = {}
+            Object.keys(teacher).forEach(function(key){
+                if (!(key === 'id')) {
+                    tempTeacher[key] = teacher[key]
+                }
+              });
+            const newTeacher = new db.Teachers(tempTeacher)
+            newTeacher.ProfileId = profileId
             await newTeacher.save()
             .then(() => {
                 resolve(newTeacher)
             })
             .catch((message) => {
                 reject(`Teacher cannot be created. The reason is: "${message}"`) 
+            })
+        })
+    },
+
+    linkToPromotion: async function(id, data) {
+        return new Promise(async (resolve, reject) => {
+            const newTeacherPromotion = new db.Promotions_Teachers({TeacherId: id, ...data})
+            await newTeacherPromotion.save()
+            .then(() => {
+                resolve(newTeacherPromotion)
+            })
+            .catch((message) => {
+                reject({})
+            })
+        })
+    },
+
+    linkToFaculty: async function(id, facultyId) {
+        return new Promise(async (resolve, reject) => {
+            const newTeacherFaculty = new db.Faculties_Teachers({TeacherId: id, FacultyId: facultyId})
+            await newTeacherFaculty.save()
+            .then(() => {
+                resolve(newTeacherFaculty)
+            })
+            .catch((message) => {
+                reject({})
+            })
+        })
+    },
+
+    setSlots: async function(data) {
+        return new Promise(async (resolve, reject) => {
+            const teacher = await db.Promotions_Teachers.findOne({
+                where: {
+                    TeacherId: data.TeacherId,
+                    PromotionId: data.PromotionId
+                }
+            })
+            teacher.availableSlotsBachelors = data.availableSlotsBachelors
+            teacher.isCoordinatorBachelors = data.isCoordinatorBachelors
+            teacher.isCoordinatorDisertation = data.isCoordinatorDisertation
+            teacher.availableSlotsDisertations = data.availableSlotsDisertations
+            
+            await teacher.save()
+            .then(() => {
+                resolve({})
+            })
+            .catch((error) => {
+                reject(error)
             })
         })
     },

@@ -66,5 +66,31 @@ module.exports = {
                 reject(`Secretary data cannot be deleted.The reason is: ${message}`)
             })
         })
-    }      
+    },
+    
+    getTeacherWithProfileAndUser: async function(secretaryId) {
+        return new Promise(async (resolve, reject) => {
+            const secretary = await db.Students.findOne({
+                where: {
+                    id: secretaryId
+                },
+                include: [
+                    {
+                        model: db.Profiles,
+                        include: [
+                            {
+                                model: db.Users
+                            }
+                        ]
+                    }
+                ]
+            })
+
+            if(secretary) {
+                resolve(secretary)
+            } else {
+                reject({})
+            }
+        })
+    },
 }

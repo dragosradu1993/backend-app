@@ -12,7 +12,6 @@ module.exports = (sequelize) => {
         identityId: {
             type: DataTypes.STRING,
             allowNull: false,
-            unique: true,
             validate: {
                 isNumeric: true
             }
@@ -24,16 +23,18 @@ module.exports = (sequelize) => {
         budgetForm: {
             type: DataTypes.ENUM('BUGET', 'TAXA'),
             allowNull: false
+        },
+        type: {
+            type: DataTypes.ENUM('LICENTA', 'MASTER'),
+            allowNull: false            
         }
     })
 
     Student.associate = (models) => {
-        Student.hasMany(models.Projects, {
-          foreignKey: 'studentId',
-          as: 'projects'
-        })
+        Student.hasMany(models.Projects)
         Student.belongsTo(models.Profiles)
         Student.belongsToMany(models.Promotions, {through: 'Promotions_Students'})
+        Student.belongsToMany(models.Faculties, {through: 'Faculties_Students'})
     }
 
     return Student

@@ -1,4 +1,3 @@
-const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const lod = require('lodash')
 const db = require('../../models')
@@ -6,6 +5,11 @@ const userUtils = require('./utils/userUtils')
 const userController = require('../../controllers/user.controller')
 const profileController = require('../../controllers/profiles/profile.controller')
 const send = require('../mail/sender')
+const appUtils = require('../app/utils/app.utils')
+const messagesController = require('../../controllers/messages.controller')
+const teacherController = require('../../controllers/teacher.controller')
+const projectController = require('../../controllers/project.controller')
+const facultiesController = require('../../controllers/faculties.controller')
 
 const env = process.env.NODE_ENV
 const config = require("../../config/config.json")[env]
@@ -37,8 +41,8 @@ module.exports = {
     },
 
     //Login user
-    loginUser: async function(req,res) {
-        userUtils.validateRegisterUser(req, true)
+    loginUser: async function(req,res, next) {
+       await userUtils.validateRegisterUser(req, true)
         .then(async () => {
             await userController.getUser(req.body.email)
             .then(async (user) => {
@@ -46,25 +50,37 @@ module.exports = {
                 const loggedUser = {
                     id: user.id,
                     email: user.email,
-                    roleName: userRole
+                    roleName: userRole,
+                    state: user.state
                 }
                 await userUtils.isValidCredentials(req.body.password, user)
-                .then(() => {
-                    const token = jwt.sign({
-                        user: lod.pick(loggedUser, ['id', 'email', 'roleName'])},
-                        config.AUTH_KEY,
-                        {
-                            expiresIn: '240m',
-                        }
-                    )
-                    res.status(200).json({
-                        title: "Login status",
-                        details: {
-                            success: true,
-                            message: "Login with success",
-                            token: token
-                        }
-                    })
+                .then(async () => {
+                    try {
+                        await userController.resetLoginRetry(user)
+                        const token = jwt.sign({
+                            user: lod.pick(loggedUser, ['id', 'email', 'roleName', 'state'])},
+                            config.AUTH_KEY,
+                            {
+                                expiresIn: '240m',
+                            }
+                        )
+                        res.status(200).json({
+                            title: "Login status",
+                            details: {
+                                success: true,
+                                message: "Login with success",
+                                token: token
+                            }
+                        })
+                    } catch(error) {
+                        res.status(400).json({
+                            title: "Login status",
+                            details: {
+                                success: false,
+                                message: error,
+                            }
+                        })
+                    }
                 })
                 .catch((message) => {
                     res.status(400).json({title: "Login status error", 
@@ -72,6 +88,7 @@ module.exports = {
                         success: false,
                         message: message
                     }})
+                    next()
                 })
             })
             .catch((message) => {
@@ -80,6 +97,7 @@ module.exports = {
                     success: false,
                     message: message
                 }})
+                next()
             })
         })
         .catch((message)=> {
@@ -87,10 +105,10 @@ module.exports = {
             details: {
                 success: false,
                 message: message
-            }})  
+            }}) 
+            next() 
         })
- 
-        },
+    },
     
     getUsersByRole: async function(req, res) {
         await userUtils.checkOAuthToken(req)
@@ -154,6 +172,144 @@ module.exports = {
         })
     },
 
+    getStudentFullProfile: async function(req,res) {
+        await userUtils.checkOAuthToken(req)
+        .then(async (request) => {
+            await userController.getUserStudentFullData(request.user.id)
+            .then(async (user) => {
+                const dashboard = await appUtils.generateStudentDashboard(user)
+                res.status(200).json({
+                    ...dashboard
+                })
+            })
+            .catch((message) => {
+                res.status(404).json({
+                    title: "User Info Error",
+                    details: {
+                        success: false,
+                        message: message
+                    }
+                })                
+            })
+        })
+        .catch((message) => {
+            res.status(401).json({
+                title: "User Info Error",
+                details: {
+                    success: false,
+                    message: message
+                }
+            })            
+        })
+    },
+
+    getTeacherFullProfile: async function(req,res) {
+        await userUtils.checkOAuthToken(req)
+        .then(async (request) => {
+            await userController.getUserTeacherFullData(request.user.id)
+            .then(async (user) => {
+                const dashboard = await appUtils.generateTeacherDashboard(user)
+                res.status(200).json({
+                    ...dashboard
+                })
+            })
+            .catch((message) => {
+                res.status(404).json({
+                    title: "User Info Error",
+                    details: {
+                        success: false,
+                        message: message
+                    }
+                })                
+            })
+        })
+        .catch((message) => {
+            res.status(401).json({
+                title: "User Info Error",
+                details: {
+                    success: false,
+                    message: message
+                }
+            })            
+        })
+    },
+
+    getAdminDashboardData: async function(req,res) {
+        await userUtils.checkOAuthToken(req)
+        .then(async (request) => {
+            let resp = {}, profile, users, blockedUsers, faculties
+            try {
+                profile = await userController.getProfile(req.query.id, 'password')
+                if(profile) {
+                    resp.profile = profile
+                    users = await userController.getUsers(req.query.id)
+                    if(users) {
+                        resp.users = users
+                        blockedUsers = await userController.getBlockedUsers('','ADMIN')
+                        if(blockedUsers) {
+                            resp.blockedUsers = blockedUsers
+                            faculties = await facultiesController.getAll()
+                            if(faculties) {
+                                resp.faculties = faculties
+                            }
+                        }
+                    }
+                }
+                res.status(200).json(resp)
+            } catch(error) {
+                if(!profile) {
+                    res.status(400).json({})
+                } else {
+                    if(!users) {
+                        resp.users = []
+                    }
+                    if(!blockedUsers) {
+                        resp.blockedUsers = []
+                    }
+                    if(!faculties) {
+                        resp.faculties = []
+                    }
+                    res.status(200).json(resp)
+                }
+
+            }
+        })
+        .catch((message) => {
+            res.status(401).json({
+                title: "User Info Error",
+                details: {
+                    success: false,
+                    message: message
+                }
+            })            
+        })
+    },
+
+    setTeacherProjectSlots: async function(req,res) {
+        await userUtils.checkOAuthToken(req)
+        .then(async (request) => {
+            try {
+                const teacherPromotion = teacherController.setSlots(req.body)
+                res.status(200).json({
+                    message: "Datele privind coordonarea proiectelor a fost setată cu succes!"
+                })
+            }catch(error) {
+                res.status(400).json({
+                    message: message
+                })   
+            }
+        })
+        .catch((message) => {
+            res.status(401).json({
+                title: "User Info Error",
+                details: {
+                    success: false,
+                    message: message
+                }
+            })            
+        })
+    },
+
     getUserRole: async function(req, res) {
         await userUtils.checkOAuthToken(req)
             .then(async (request) => {
@@ -189,7 +345,7 @@ module.exports = {
             try {
                 const user = await userController.getUser(request.user.email)
                 if(user) {
-                        const changedUser = await userController.changePassword(req,user, req.query.fl)
+                        const changedUser = await userController.changePassword(req, user, false)
                         if(changedUser)
                         {
                             res.status(200)
@@ -222,17 +378,17 @@ module.exports = {
 
     selfResetPassword: async function(req,res) {
         await userUtils.checkOAuthToken(req)
-        .then(async (request) => {
+        .then(async () => {
             try {
-                const user = await userController.getUser(request.user.email)
+                const user = await userController.getUser(req.query.email)
                 if(user) {
                     const newPwd = userUtils.generateRandomPassword(8)
                     req.body.password = newPwd
-                    await userController.changePassword(req, user, false)
+                    await userController.changePassword(req, user, true)
                     .then(async() => {
-                        await send(`<p>Parola ta tocmai a fost resetata</p><br/><p>Parola temporara este <b>${newPwd}</b></p>`, request.user.email, 'Parola ta a fost resetata')
+                        await send(`<p>Parola ta tocmai a fost resetata</p><br/><p>Parola temporara este <b>${newPwd}</b></p>`, user.email, 'Parola ta a fost resetata')
                         .then((results) =>{
-                            res.status(200).json({message: `Password has been reset! We sent an email with a temporary password at ${request.user.email}`})
+                            res.status(200).json({message: `Parola a fost resetata! Ti-am trimis un email cu o parola noua temporara la adresa ${user.email}`})
                         })
                         .catch((message) => {
                             res.status(400).json({message:message})

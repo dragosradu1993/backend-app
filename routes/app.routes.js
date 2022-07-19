@@ -12,10 +12,11 @@ const {
     getAppDashboard,
     getAllUsersData,
     getBlockedUsers,
-    getUsersLastXDays
+    getUsersLastXDays,
+    getDialogData,
+    getDataTableData
 } = require('../services/app/app.service')
 
-const student = require('../services/app/student.service')
 const faculty = require('../services/app/faculty.service')
 const { route } = require('./user.routes')
 
@@ -30,10 +31,10 @@ router.route('/app-info/get/dashboard').get(getAppDashboard)
 router.route('/app-info/get/all-user-data').get(getAllUsersData)
 router.route('/app-info/get/get-blocked-users').get(getBlockedUsers)
 router.route('/app-info/get/users-last-days').get(getUsersLastXDays)
+router.route('/app-info/get/dialog').get(getDialogData)
+router.route('/app-info/get/data-grid').get(getDataTableData)
 
 
-//Students
-router.route('/app/students/add').post(student.add)
 
 //Faculties
 router.route('/app/faculties/add').post(faculty.add)

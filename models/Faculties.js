@@ -20,26 +20,14 @@ module.exports = (sequelize) => {
     })
 
     Faculty.associate = function(models) {
-        Faculty.hasMany(models.Students, {
-         foreignKey: 'facultyId',
-         as: 'students'
-        })
+        Faculty.belongsToMany(models.Students,{through: 'Faculties_Students'})
         Faculty.hasMany(models.Secretaries, {
             foreignKey: 'facultyId',
             as: 'secretaries'
            })
-        Faculty.hasMany(models.Teachers, {
-            foreignKey: 'facultyId',
-            as: 'teachers'
-        })
-        Faculty.hasMany(models.Promotions, {
-            foreignKey: 'facultyId',
-            as: 'promotions'
-        })
-        Faculty.hasMany(models.Projects, {
-            foreignKey: 'facultyId',
-            as: 'projects'
-        })
+        Faculty.belongsToMany(models.Teachers, {through: 'Faculties_Teachers'})
+        Faculty.hasMany(models.Promotions)
+        Faculty.hasMany(models.Projects)
     }
     return Faculty
 }

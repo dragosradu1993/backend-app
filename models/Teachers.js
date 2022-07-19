@@ -12,17 +12,15 @@ module.exports = (sequelize) => {
         department: {
             type: DataTypes.STRING,
             allowNull: false
-        }
+        }      
     })
 
     Teacher.associate = function(models) {
       
-        Teacher.hasMany(models.Projects, {
-          foreignKey: 'teacherId',
-          target: 'id'
-        });
+        Teacher.hasMany(models.Projects)
         Teacher.belongsTo(models.Profiles)
         Teacher.belongsToMany(models.Promotions, {through: 'Promotions_Teachers'})
+        Teacher.belongsToMany(models.Faculties, {through: 'Faculties_Teachers'})
     }
     return Teacher
 }

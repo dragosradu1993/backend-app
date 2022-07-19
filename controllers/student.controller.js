@@ -59,15 +59,74 @@ module.exports = {
         })
     },
 
+    getStudentWithProfileAndUser: async function(studentId) {
+        return new Promise(async (resolve, reject) => {
+            const student = await db.Students.findOne({
+                where: {
+                    id: studentId
+                },
+                include: [
+                    {
+                        model: db.Profiles,
+                        include: [
+                            {
+                                model: db.Users
+                            }
+                        ]
+                    }
+                ]
+            })
+
+            if(student) {
+                resolve(student)
+            } else {
+                reject({})
+            }
+        })
+    },
+
     add: async function(student, profileId) {
         return new Promise(async (resolve, reject) => {
-            const newStudent = new db.Students(student)
+            let tempStudent = {}
+            Object.keys(student).forEach(function(key){
+                if (!(key === 'id')) {
+                  tempStudent[key] = student[key]
+                }
+              });
+            const newStudent = new db.Students(tempStudent)
+            newStudent.ProfileId = profileId
             await newStudent.save()
             .then(() => {
                 resolve(newStudent)
             })
             .catch((message) => {
                 reject(`Student cannot be created. The reason is: "${message}"`) 
+            })
+        })
+    },
+
+    linkToPromotion: async function(studentId, promotionId) {
+        return new Promise(async (resolve, reject) => {
+            const newStudentPromotion = new db.Promotions_Students({StudentId:studentId, PromotionId:promotionId})
+            await newStudentPromotion.save()
+            .then(() => {
+                resolve(newStudentPromotion)
+            })
+            .catch((message) => {
+                reject({})
+            })
+        })
+    },
+
+    linkToFaculty: async function(studentId, facultyId) {
+        return new Promise(async (resolve, reject) => {
+            const newStudentFaculty = new db.Faculties_Students({StudentId:studentId, FacultyId:facultyId})
+            await newStudentFaculty.save()
+            .then(() => {
+                resolve(newStudentFaculty)
+            })
+            .catch((message) => {
+                reject({})
             })
         })
     },

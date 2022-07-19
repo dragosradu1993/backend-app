@@ -40,9 +40,8 @@ module.exports = (sequelize) => {
             defaultValue: false,
             allowNull: false
         },
-        firstLogin: {
-            type: DataTypes.BOOLEAN,
-            defaultValue:true,
+        state: {
+            type: DataTypes.ENUM('FIRST-LOGIN', 'RESET-PASSWORD', 'AFTER-RESET-PASSWORD', 'OK'),
             allowNull: false
         }
     })
@@ -55,6 +54,7 @@ module.exports = (sequelize) => {
 }
 
 validateEmail = (email) => {
-    let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    return re.test(String(email).toLowerCase());
+    let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+    return re.test(String(email).toLowerCase())
 }
+

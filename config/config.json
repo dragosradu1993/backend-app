@@ -6,7 +6,8 @@
       "host": "127.0.0.1",
       "dialect": "mariadb",
       "AUTH_KEY": "fgeiyfb",
-      "PORT": 3001
+      "PORT": 3001,
+      "API_KEY": "oFV5ruqEfg5TAR8oRBGgXl5AGw69gMBLSgc6mhI007OQbKZAOPBs3cjIbEMMqNW48bLpk0aRioLovvFWHb7qElkUS5frBmyARAKre6IOiV2jw4N0L4M3CXFlnhJIpmGs"
     },
     "test": {
       "username": "app",
@@ -16,7 +17,7 @@
       "dialect": "mariadb",
       "AUTH_KEY": "sifogfg",
       "PORT": 3002,
-      "logging": false
+      "API_KEY": "OO8vCAwNln6HNCRyoEWHSqe6KGyBXd9iLDxPb9htoGkQBT16OSjqklemfxFQlRSDlzONVzieKvWgxOK163499I8A8g8uxqUhGRQU7UvBPsVioGyjl7IIVzMv9IEejH4R"
     },
     "prod": {
       "username": "app",
@@ -26,6 +27,7 @@
       "dialect": "mariadb",
       "AUTH_KEY": "sifogdiugP",
       "PORT": 3000,
-      "logging": false
+      "logging": false,
+      "API_KEY": "OXvH0Lne58v23tZAN42YouZ8Mknrt6zGa4cD9QqgIq8NOcMk7NaPFiz84ybc79qO93ISAqwjilMJF1WFUnlNdjDJXvNbbN5tY4q8NHA0XrFX6GKHUCfI7HkAtAVOaePa"
     }
 }

@@ -1,8 +1,10 @@
 const bcrypt = require('bcrypt')
 const jwt = require ('jsonwebtoken')
-const env = process.env.NODE_ENV || 'development';
+const env = process.env.NODE_ENV
 const config = require('../../../config/config.json')[env];
 const userController = require('../../../controllers/user.controller')
+const dotenv = require('dotenv')
+const fs = require('fs');
 
 module.exports = {
     hashCredentials: async function(pwd) {
@@ -29,6 +31,26 @@ module.exports = {
         })
     },
 
+    generateKey: function(length) {
+        let result = ''
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@!_'
+        const charsLength = chars.length
+        for(let i = 0; i<length; i++) {
+            result += chars.charAt(Math.floor(Math.random() * charsLength))
+        }
+
+        return result
+    },
+
+    generateFile: function(length) {
+        fs.writeFile('key',this.generateKey(length), function(err) {
+            if(err) {
+                return console.log(err)
+            }
+            console.log('The key has been set')
+        })
+    },
+
     generateRandomPassword: function(length) {
         let result = ''
         const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@!_'
@@ -42,26 +64,37 @@ module.exports = {
 
     checkOAuthToken: async function(req) {
         return new Promise((resolve, reject) => {
-            const token = req.headers.authorization.split(" ")[1]
-            jwt.verify(token, config.AUTH_KEY, function(err, decoded){
-                if(err){
+            if(req.headers.hasOwnProperty('authorization')) {
+                const token = req.headers.authorization.split(" ")[1]
+                jwt.verify(token, config.AUTH_KEY, function(err, decoded){
+                    if(err){
+                        reject(`You cannot do any actions. The reason is: AUTH FAILED!`)
+                    }
+                    req.userData = decoded
+                    resolve(req.userData)
+                })
+            }
+            if(req.headers.hasOwnProperty('x-api-key')) {
+                const key = req.headers['x-api-key']
+                console.log(key === config.API_KEY)
+                if(key === config.API_KEY) {
+                    resolve('OK')
+                } else {
                     reject(`You cannot do any actions. The reason is: AUTH FAILED!`)
                 }
-                req.userData = decoded
-                resolve(req.userData)
-            })
-        })/*
-        try {
-            const token = req.headers.authorization.split(" ")[1]
-            console.warn(token)
-            const decoded = jwt.verify(token, config.AUTH_KEY)
-            console.warn(decoded)
-            req.userData = decoded
-            next()
-        } catch(error) {
-            console.warn(error)
-            return res.status(401).json({title: "OAUTH FAILED", error: { message: "You cannot do any actions. The reason is: AUTH FAILED!"}})
-        }*/
+            }
+        })
+    },
+        
+    checkAPIKEY: async function(req) {
+        return new Promise((resolve, reject) => {
+            const key = req.headers['x-api-key']
+            if(key === config[process.NODE_ENV].API_KEY) {
+                resolve('OK')
+            } else {
+                reject(`You cannot do any actions. The reason is: AUTH FAILED!`)
+            }
+        })
     },
 
     validateEmail: function(email) {

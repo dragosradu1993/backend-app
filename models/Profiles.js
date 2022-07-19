@@ -20,16 +20,12 @@ module.exports = (sequelize, DataTypes) => {
         phoneNumber: {
             type: DataTypes.STRING, 
             allowNull:true
-        },
-        profileImage: {
-            type: DataTypes.STRING,
-            allowNull: true
         }
     });
 
     Profile.associate = function(models) {
         Profile.belongsTo(models.Users)
-        Profile.hasOne(models.Students)
+        Profile.hasMany(models.Students)
         Profile.hasOne(models.Teachers)
         Profile.hasOne(models.Secretaries)
     }

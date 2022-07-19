@@ -36,26 +36,26 @@ module.exports = {
                     {model: db.Secretaries, as: 'secretaries', include: [{model: db.Profiles, include: [{model:db.Users, attributes: ['email']}]}], where: {
                         ProfileId: profileId
                     }},
-                    {model: db.Promotions, as: 'promotions', include: [
+                    {model: db.Promotions, include: [
                         {model: db.Students, include: [
                             {model: db.Profiles, include: [
-                                {model: db.Users}
+                                {model: db.Users, attributes: ['id', 'email']}
                             ]}
                         ]},
                         {model: db.Teachers,  include: [
                             {model: db.Profiles, include: [
-                                {model: db.Users}
+                                {model: db.Users, attributes: ['id', 'email']}
                             ]}
                         ]},
-                        {model: db.Projects, as: 'projects'}
+                        {model: db.Projects}
                     ] }
                 ]
             } else {
                 models = [
-                    {model: db.Promotions, as: 'promotions', include: [
+                    {model: db.Promotions, include: [
                         {model: db.Students},
                         {model: db.Teachers},
-                        {model: db.Projects, as: 'projects'}
+                        {model: db.Projects}
                     ]}
                 ]
             }
@@ -68,7 +68,7 @@ module.exports = {
             if(facultyData) {
                 resolve(facultyData)
             } else {
-                reject()
+                reject({})
             }
             
         })

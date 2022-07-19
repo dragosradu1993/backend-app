@@ -16,6 +16,14 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             defaultValue:0,
             allowNull: false
+        },
+        isCoordinatorBachelors: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        },
+        isCoordinatorDisertation: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
         }
     })
 

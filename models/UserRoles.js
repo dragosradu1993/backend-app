@@ -10,4 +10,6 @@ module.exports = (sequelize, DataTypes) => {
         UserRole.belongsTo(models.Users)
     }
     return UserRole;
-};
+}
+
+

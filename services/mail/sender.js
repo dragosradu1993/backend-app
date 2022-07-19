@@ -3,12 +3,9 @@ const nodemailer = require('nodemailer')
 
 const send = async(body, to, subject) => {
     let transporter = nodemailer.createTransport({
-        host: "smtp-mail.outlook.com",
+        service: 'Outlook365',
         secure: false,
         port: 587,
-        tls: {
-            ciphers: 'SSLv3'
-        },
         auth: {
           user: "gestiunelicenta@outlook.com",
           pass: "DRG_231423@"
