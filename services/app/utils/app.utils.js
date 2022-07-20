@@ -6,24 +6,36 @@ const studentController = require("../../../controllers/student.controller")
 const userController = require("../../../controllers/user.controller")
 
 const ADMINMENU = ['Dashboard', 'Toti utilizatorii', 'Utilizatori blocați', 'Adăugare utilizator', 'Adăugare facultate']
-const SECRETARYMENU = ['Dashboard', 'Adăugare promoție', 'Adăugare anunțuri' ,'Adăugare studenți', 'Adăugare profesori', 'Proiecte licență', 'Proiecte disertație', 'Studenți neînscriși']
-const STUDENTMENU = ['Dashboard', 'Cererile mele', 'Proiectele mele', 'Mesaje']
-const TEACHERMENU = ['Dashboard', 'Cereri studenți', 'Proiecte', 'Mesaje']
+//const SECRETARYMENU = ['Dashboard', 'Adăugare promoție', 'Adăugare anunțuri' ,'Adăugare studenți', 'Adăugare profesori', 'Proiecte licență', 'Proiecte disertație', 'Studenți neînscriși']
+const SECRETARYMENU = ['Dashboard', 'Adăugare promoție' ,'Adăugare studenți', 'Adăugare profesori', 'Proiecte licență', 'Proiecte disertație', 'Studenți neînscriși']
+//const STUDENTMENU = ['Dashboard', 'Cererile mele', 'Proiectele mele', 'Mesaje']
+const STUDENTMENU = ['Dashboard', 'Cererile mele', 'Proiectele mele']
+//const TEACHERMENU = ['Dashboard', 'Cereri studenți', 'Proiecte', 'Mesaje']
+const TEACHERMENU = ['Dashboard', 'Cereri studenți', 'Proiecte']
 
 const ADMINREDIRECT = ['/dashboard', '/all-users', '/blocked-users', '/add-users', '/add-faculty']
-const SECRETARYREDIRECT = ['/dashboard', '/add-promotion' ,'/add-announce', '/add-students', '/add-teachers', '/bachelor-projects', '/disertation-projects', '/no-proj-students']
-const STUDENTREDIRECT = ['/dashboard', '/my-request', '/my-projects', '/messages']
-const TEACHERREDIRECT = ['/dashboard', '/my-request', '/my-projects', '/messages']
+//const SECRETARYREDIRECT = ['/dashboard', '/add-promotion' ,'/add-announce', '/add-students', '/add-teachers', '/bachelor-projects', '/disertation-projects', '/no-proj-students']
+const SECRETARYREDIRECT = ['/dashboard', '/add-promotion' , '/add-students', '/add-teachers', '/bachelor-projects', '/disertation-projects', '/no-proj-students']
+//const STUDENTREDIRECT = ['/dashboard', '/my-request', '/my-projects', '/messages']
+const STUDENTREDIRECT = ['/dashboard', '/my-request', '/my-projects']
+//const TEACHERREDIRECT = ['/dashboard', '/my-request', '/my-projects', '/messages']
+const TEACHERREDIRECT = ['/dashboard', '/my-request', '/my-projects']
 
 const ADMIN_CONTENT_TYPE = ['page', 'page', 'page', 'page', 'page']
-const SECRETARY_CONTENT_TYPE = ['page', 'dialog', 'dialog', 'page', 'page', 'page', 'page', 'page']
-const STUDENT_CONTENT_TYPE = ['page', 'page', 'page', 'page', 'page', 'page']
-const TEACHER_CONTENT_TYPE = ['page', 'page', 'page', 'page', 'page', 'page']
+//const SECRETARY_CONTENT_TYPE = ['page', 'dialog', 'dialog', 'page', 'page', 'page', 'page', 'page']
+const SECRETARY_CONTENT_TYPE = ['page', 'dialog', 'page', 'page', 'page', 'page', 'page']
+//const STUDENT_CONTENT_TYPE = ['page', 'page', 'page', 'page', 'page', 'page']
+const STUDENT_CONTENT_TYPE = ['page', 'page', 'page', 'page']
+const TEACHER_CONTENT_TYPE = ['page', 'page', 'page']//
+//const TEACHER_CONTENT_TYPE = ['page', 'page', 'page', 'page', 'page', 'page']
 
 const ADMINICONS = ['<Dashboard/>', '<Group/>', '<Group/>', '<Group/>', '<AccountBalance/>']
+//const SECRETARYICONS = ['<Dashboard/>', '<Add/>', '<PersonAddAlt/>', '<PersonAddAlt/>', '<School/>', '<School/>', '<Person/>']
 const SECRETARYICONS = ['<Dashboard/>', '<Add/>','<AddComment/>', '<PersonAddAlt/>', '<PersonAddAlt/>', '<School/>', '<School/>', '<Person/>']
-const STUDENTICONS = ['<Dashboard/>', '<Folder/>','<Folder/>', '<Message/>']
-const TEACHERICONS = ['<Dashboard/>', '<Folder/>', '<Folder/>', '<Message/>']
+//const STUDENTICONS = ['<Dashboard/>', '<Folder/>','<Folder/>', '<Message/>']
+const STUDENTICONS = ['<Dashboard/>', '<Folder/>','<Folder/>']
+//const TEACHERICONS = ['<Dashboard/>', '<Folder/>', '<Folder/>', '<Message/>']
+const TEACHERICONS = ['<Dashboard/>', '<Folder/>', '<Folder/>']
 
 const SETTINGS  = {
     addStudentsBySecretaryTextFields: [
@@ -1848,8 +1860,8 @@ module.exports = {
                 id: `textfield-${count}`,
                 required: true,
                 multiline: true,
-                valueType: 'message',
-                sendKey: 'message',
+                valueType: 'text',
+                sendKey: 'text',
                 type: 'text'
             }
             count++

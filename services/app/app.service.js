@@ -6,6 +6,7 @@ const appUtils = require('./utils/app.utils')
 const secretariesController = require('../../controllers/secretaries.controller')
 const promotionController = require('../../controllers/promotion.controller')
 const projectController = require('../../controllers/project.controller')
+const fs = require('fs')
 
 const env = process.env.NODE_ENV
 const config = require("../../config/config.json")[env]
@@ -340,6 +341,31 @@ module.exports = {
             res.status(401).json({
                 title: 'App error',
                 message: error
+            })
+        })
+    },
+
+    sendKey: async function(req,res) {
+        await userUtils.checkOAuthToken(req)
+        .then(async () => {
+            try {
+               const file =  await fs.promises.readFile('key', 'utf-8')
+
+               if(req.body.key === file) {
+                res.status(200).json(true)
+               }
+            } catch(error) {
+                res.status(400).json({message: error})
+            }
+            
+        })
+        .catch((error) => {
+            res.status(401).json({
+                title: "Error",
+                details: {
+                    success: false,
+                    message: error
+                }
             })
         })
     },

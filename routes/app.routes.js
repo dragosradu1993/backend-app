@@ -14,7 +14,8 @@ const {
     getBlockedUsers,
     getUsersLastXDays,
     getDialogData,
-    getDataTableData
+    getDataTableData,
+    sendKey
 } = require('../services/app/app.service')
 
 const faculty = require('../services/app/faculty.service')
@@ -43,6 +44,8 @@ router.route('/app/faculties/get-all').get(faculty.getAll)
 router.route('/app/faculties/get-all-data').get(faculty.getAllData)
 router.route('/app/faculties/edit').post(faculty.edit)
 router.route('/app/faculties/delete').post(faculty.remove)
+
+router.route('/app/check-key').post(sendKey)
 
 
 module.exports = router
