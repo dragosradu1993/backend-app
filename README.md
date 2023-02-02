@@ -1,2 +1,1 @@
 # backend-licenta
-Test licenta
